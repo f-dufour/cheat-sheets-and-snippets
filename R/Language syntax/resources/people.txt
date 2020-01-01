@@ -1,0 +1,8 @@
+fname lname sex
+Andy Brennan male
+Harry Truman male
+Lucy Moran female
+Dale Cooper male
+Shelly Johnson female
+Audrey Horne female
+Bob ` male

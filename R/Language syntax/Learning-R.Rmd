@@ -1,0 +1,697 @@
+---
+title: "Learning R - Syntax"
+author: Florent Dufour
+date: 2017 - 2019
+output: 
+  html_notebook:
+    toc: true
+    toc_float: true
+    toc_depth: 3
+    theme: simplex
+---
+
+# Variables and operators
+
+## Assign a variable
+
+These 3 assignements are correct:
+
+```{r}
+variableA = 2
+variable.a = 2
+a <-2
+```
+
+## Data types
+
+The different types:
+```{r}
+print(class(4))                      # numeric
+print(class(4L))                     # integer
+print(class(TRUE))                   # logical
+print(class(T))                      # logical
+print(class(FALSE))                  # logical
+print(class(F))                      # logical
+print(class(1 +4i))                  # complex
+print(class("Pancake"))              # character
+print(class(charToRaw("Blueberry"))) # raw
+```
+
+The operation with types:
+```{r}
+# Check the type
+num = 2
+int = 6L
+is.integer(num)
+is.integer(int)
+is.integer(num)
+is.numeric(int)
+
+# Convert types (if possible)
+as.integer(num)
+```
+
+## Arithmetic operators
+
+```{r}
+sprintf("1 + 2 = %d", 1+2)
+sprintf("2 - 3 = %d", 2-3)
+sprintf("3 * 4 = %d", 3*4)
+sprintf("4 / 5 = %1.3f", 4/5)
+sprintf("5 %% 4 = %d", 5%%4)
+sprintf("4^2 = %d", 4^2)
+```
+
+## Relational operators
+
+```{r}
+sprintf("4 == 5: %s", 4==5)
+sprintf("4 != 5: %s", 4!=5)
+sprintf("4 > 5: %s", 4>5)
+sprintf("4 < 5: %s", 4<5)
+sprintf("4 >= 5: %s", 4>=5)
+sprintf("4 <= 5: %s", 4<=5)
+```
+
+## Vectors
+
+They store multiple variables:
+```{r}
+numbers = c(3,2,0,1,8)
+numbers[1] # WARNING: Vectors start at 1
+length(numbers)
+numbers[length(numbers)] # last
+numbers[-1] # We don't want the first one
+numbers[c(1,2)] # Two first values; again, start at 1
+numbers[5] = 1 # Replace the 5th value by 1
+numbers[c(1,2)] = c(4,5) # Replace two forst values
+sort(numbers) # sort ascending
+sort(numbers, decreasing=T) # sort decreasing
+```
+
+Generate sequences:
+```{r}
+# Range
+oneToTen = 1:10
+
+# Sequence
+add3 = seq(from=3, to=27, by=3)
+evens = seq(from=2, by=2, length.out=10)
+
+# Repeat
+rep(x=2, times=5, each=2)
+rep(c(1, 2, 3), times=2, each=2)
+```
+
+Methods on vectors:
+```{r}
+sprintf("4 in evens %s: ", 4 %in% evens)
+
+# Array of boolean; isEven?
+oneTo20 = c(1:20)
+isEven = oneTo20 %% 2 == 0
+print(isEven)
+
+# Create an array of evens
+justEvens = oneTo20[oneTo20 %% 2 == 0]
+print(justEvens)
+```
+
+## Strings
+
+```{r}
+str1 = "This is a string"
+
+# Methods on strings
+nchar(str1)
+
+# Compare strings
+sprintf("pancake > blueberry %s", "dog" > "blueberry")
+sprintf("pancake == blueberry %s", "dog" == "blueberry")
+
+# Combine strings
+str2 = paste("Blueberry", "pancake", sep="+")
+
+# Delete strings
+str3 = "This is also a string"
+substr(x=str3, start=1, stop=7)
+
+# Substitute (pattern handles regex)
+## First match
+sub(pattern="pancake", replacement="jam", x=str2)
+## All matches
+gsub(pattern="Egg", replacement="Chicken", x="Egg and Egg")
+
+# Split a string in vector
+strVect = strsplit("A dog ran fast", " ")
+```
+
+## Factors
+
+- Use when limited amount of values (strings or int).
+- Notion of levels: A factor contains levels that are possible value
+
+```{r}
+
+# A factor
+direction = c("up", "left", "right", "down", "left")
+factorDirection = factor(direction)
+is.factor(factorDirection)
+
+# And its levels
+levels(x=factorDirection)
+```
+
+Define the levels and their order:
+```{r}
+daysOfTheWeek = c(
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday"
+)
+
+workingdDays = c("Wednesday", "Monday", "Tuesday")
+
+workingDaysFactors = factor(x=workingdDays, levels=daysOfTheWeek, ordered=TRUE)
+workingDaysFactors # 3 days and the 7 levels
+```
+
+## Data frames
+
+Is a table that contains any type of data in columns.
+- A row = A record
+- A column =  A variable
+
+```{r}
+customerData = data.frame(
+  name = c("Tom", "Sally", "Sue"),
+  age = c(43,28,35),
+  stringsAsFactors = T
+)
+
+# Dimension
+dim(customerData)
+# Data in row 1, column 1
+customerData[1,1] # Tom with the levels Sallly Sue Tom
+# Both info
+customerData[1, 1:2] # Tom 43
+# All ages
+customerData[1:3,2]
+# Add record (Record bind)
+recordMark = data.frame(name="Mark", age=33)
+customerData = rbind(customerData, recordMark)
+# Add column (Column bind)
+debt = c(0, 25.5, 36, 48.19)
+customerData = cbind(customerData, debt)
+customerData
+
+# Give customers who owe money
+owesMoney = customerData[customerData$debt > 0, ]
+owesMoney # Sally Sue and Mark
+
+# head and tail
+## head: Shows the beginning of a dataframe
+## tail:  //    //   ending  // //   //
+
+head(owesMoney, 2)
+tail(owesMoney, 1)
+```
+
+# Decision
+
+## Logical operators
+
+```{r}
+sprintf("TRUE && FALSE = %s", T&&F) # AND
+sprintf("TRUE || FALSE = %s", T||F) # OR
+sprintf("!TRUE = %s", !T)           # NOT
+```
+
+## Statements
+
+### if statement
+
+```{r}
+age = 18
+
+if (age >= 18){
+  print("drive and vote")
+} else if (age >= 16) {
+  print("Drive")
+} else {
+  print ("wait")
+}
+```
+
+### Switch
+
+```{r}
+grade = "C"
+
+# Waht's after the = get executed
+switch(grade,
+       "A" = print("Great"),
+       "B" = print("Good"),
+       "C" = print("Ok"),
+       "D" = print("Bad"),
+       "F" = print("Terrible"),
+       print("No such grade")) # Default
+```
+
+# Looping
+
+## Repeat
+
+Until a condition is met
+```{r}
+num = 1
+repeat {
+  print(num)
+  num = num + 1
+  if(num > 5){
+    break
+  }
+}
+```
+
+## While
+
+While a condition is true
+```{r}
+num = 5
+while(num > 0) {
+  num = num -1
+  if (num %% 2 == 0){
+    next # Skip the rest of the loop
+  }
+  print(num) # The odd values
+}
+```
+
+## For
+
+Cycle through vectors:
+
+```{r}
+oneToFive = 1:5
+for (i in oneToFive){
+  print(i)
+}
+```
+
+Even shorter:
+
+```{r}
+for (i in 1:5){
+  print(i)
+}
+```
+
+# Matrices & Arrays
+
+## Matrices
+
+Store values in rows and columns
+
+```{r}
+matrix.1dimension  = matrix(data=c(1,2,3,4))
+matrix.2dimensions = matrix(data=c(1,2,3,4), nrow=2, ncol=2) # Automatic
+
+# Fill Rows then columns
+matrix.3 = matrix(data = c(1,2,3,4), nrow=2, ncol=2, byrow = T)
+dim(matrix.3) # 2 by 2
+
+# Get a value at a ro and a column
+matrix.3[1,2]
+
+# Get entire row
+matrix.3[1,]
+
+# Get entire column
+matrix.3[,2]
+
+
+# Make a matrix with vectors
+## We use rbind
+
+matrix.4 = rbind(1:3, 4:6, 7:9)
+
+# Get the 2 last rows:
+matrix.4[2:3,]
+
+# Same result: Omit the first row:
+matrix.4[-1,]
+
+# change a value
+matrix.4[1,1] = 0
+
+matrix.4[1,] = c(10, 11, 12)
+```
+
+## Multi-dimensional arrays
+
+```{r}
+# 2 rows, 2 colums, 2 layers
+array.3dimensions = array(data = 1:8, dim=c(2,2,2))
+array.3dimensions
+
+# Get a value
+array.3dimensions[1,2,2]
+
+# ... Everything the same
+```
+
+# Functions
+
+In R, a function is just an object that performs operations on passed attributes and then returns the result
+
+## Definition
+
+```{r}
+# A basic funciton:
+getSum = function(num1, num2){
+  return (num1 + num2)
+}
+
+sprintf("5 + 6 = %d", getSum(5,6))
+
+# Last statement can be the return:
+getDiff = function(num1, num2){
+  num1 - num2
+}
+
+sprintf("5 - 6 = %d", getDiff(5,6))
+
+# Possible to put default values in signature
+getDiv = function(num1, num2=1) { }
+
+# Return multiple value in a list
+makelist = function(string){
+  return(strsplit(string, " "))
+}
+
+# Accept variable number of arg
+getSumMore = function (...){
+  numList = list(...)
+  sum = 0
+  for (i in numList){
+    sum = sum + i
+  }
+  return(sum)
+}
+getSumMore(1,2,4,6,7)
+```
+## Anonymous function
+
+```{r}
+# Anonymous function
+numList = 1:10
+doubleList =  (function(x) x*2) (numList)
+```
+
+
+Store functions in lists:
+```{r}
+addFunc = list(
+  add2 = function(x) x+2,
+  add3 = function(x) x+3
+)
+
+addFunc$add2(5)
+```
+
+## Clojures
+
+A funciton created by a function
+
+```{r}
+power = function(exp){
+  function(x){
+    x ^ exp
+  }
+}
+
+cubed = power(3)
+cubed(2)   # On a value
+cubed(1:5) # On a vector
+```
+
+## Exceptions handling
+
+Basic Idea:
+```{r}
+miss = function(x){
+  if (missing(x)) {
+    return("Missing argument")
+  } else {
+    return(x)
+  }
+}
+```
+
+With try catch:
+```{r}
+divide = function(num1, num2){
+  tryCatch(
+    num1 / num2,
+    error = function(e){
+      if(is.character(num1) || is.character(num2)){
+        print("Can't divide with strings")
+      }
+    }
+  )
+}
+
+divide(2, "5")
+divide(2, 5)
+```
+
+# I/O
+
+## Read
+
+```{r}
+# Pull info in dataframe
+myPeople = read.table(file = "./resources/people.txt",
+                      header = T,
+                      sep = " ",
+                      na.strings = "`",
+                      stringsAsFactors = F)
+myPeople
+
+# Add Donna to the dataframe
+## Create Donna
+donna = data.frame(fname = "Donna",
+                   lname = "Heyward",
+                   sex = "female")
+## Record-bind her
+myPeople = rbind(myPeople, donna)
+myPeople
+```
+
+## Write
+
+```{r}
+# Update record
+myPeople[7,2] = "Marx"
+write.table(x=myPeople,
+            file = "updated_myPeople.txt",
+            sep=",", # We create a csv
+            na = "`",
+            quote = F, # Strings not quoted
+            row.names = F)
+```
+
+# Plotting
+
+## Scatter plots
+
+```{r}
+# First 5: X // last 5 : y
+xy1 = matrix(data=c(1, 2, 3, 4, 5, # X
+                    1, 2, 3, 4, 5), # Y
+             nrow = 5, ncol = 5)
+dim(xy1)
+plot(xy1)
+```
+
+With a line
+```{r}
+x = c(1,2,3,4,5)
+y = c(1,2,3,4,5)
+plot(x, y, type="l") # Type "l" as in L-INE
+```
+
+With points and line
+```{r}
+x = c(1,2,3,4,5)
+y = c(1,2,3,4,5)
+plot(x, y, type="b") # Type "b" as in B-OTH
+```
+
+With overriding points and line
+```{r}
+x = c(1,2,3,4,5)
+y = c(1,2,3,4,5)
+plot(x, y, type="o") # type "o" as in O-VERRIDE
+```
+
+### Labels and title
+
+```{r}
+x = c(1,2,3,4,5)
+y = c(1,2,3,4,5)
+plot(x, y, type="l",
+     main="My plot", 
+     xlab="x axis", ylab = "y axis",
+     col="steelBlue")
+```
+
+```{r}
+x = c(1,2,3,4,5)
+y = c(1,2,3,4,5)
+plot(x, y, type="b", pch=2, lty=2, 
+     main="My plot", 
+     xlab="x axis", ylab = "y axis",
+     col="steelBlue",
+     xlim=c(-8, 8), ylim=c(-8,8))
+```
+
+### Multiple plots
+
+Darw segments:
+```{r}
+# First plot
+x = c(1,2,3,4,5)
+y = c(1,2,3,4,5)
+plot(x, y, type="b")
+
+# Add a line
+abline(h=c(2,4), col="red", lty=2) # Lines @ 2 & 4, red, dotted
+
+# Add segments
+segments(x0=c(2,4), y0=c(2,2), x1=c(2,4), y1=c(4,4), col="red")
+```
+
+With the built-in data set faithful. Highlight eruptions with a waiting time > than 4:
+```{r}
+plot(faithful)
+eruptions4 = with(faithful, faithful[eruptions > 4,])
+points(eruptions4, col = "red", pch = 3)
+```
+
+## Draw arrows & text
+```{r}
+
+x = c(1,2,3,4,5)
+y = c(1,2,3,4,5)
+plot(x, y, type="b")
+abline(h=c(2,4), col="red", lty=2)
+segments(x0=c(2,4), y0=c(2,2), x1=c(2,4), y1=c(4,4), col="red")
+
+# Arrow
+arrows(x0=1.5, y0=4.5, x1=2.7, y1=3.25, col="blue")
+
+# Text
+text(x=1.25, y=4.75, labels="Center", col="blue")
+```
+
+## Pie charts
+
+Food preference for kids
+
+```{r}
+foodLabels = c("Spaghetti", "Pizza", "MacNCheese", "Chicken", "Tacos") # Label
+foodPref = c(15, 35, 10, 25, 15) # Preference
+#png(file="childfoodPreference.png")
+colors = rainbow(length(foodPref))
+pie(foodPref, foodLabels, main="Food Prefs", col=colors)
+legend("topright", c("Spaghetti", "Pizza", "MacNCheese", "Chicken", "Tacos"), cex=0.8,
+       fill=colors)
+```
+
+## 3D Pie chart
+
+We have to install a package. In te console:
+
+```sh
+> install.packages("plotrix")
+```
+
+```{r}
+# Load library
+library(plotrix)
+
+# Prepre
+foodLabels = c("Spaghetti", "Pizza", "MacNCheese", "Chicken", "Tacos") # Label
+foodPref = c(15, 35, 10, 25, 15) # Preference
+
+# Plot
+pie3D(foodPref, labels="foodLabels", main="Food Prefs", explode=0.05, start=pi/2, labelcex=0.8)
+```
+
+## Bar charts
+
+```{r}
+# Prepre
+foodLabels = c("Spaghetti", "Pizza", "MacNCheese", "Chicken", "Tacos") # Label
+foodPref = c(15, 35, 10, 25, 15) # Preference
+colors = rainbow(length(foodPref))
+
+# Plot
+barplot(foodPref, name="foodLabels", main="Food Prefs", xlab="Votes", ylab="food option", col=colors)
+```
+
+# Math functions
+
+## Basics
+
+```{r}
+sqrt(x=4)
+log(x=4, base=2)
+exp(x=2)
+sum(c(1,2,3))
+random = c(1,5,6,7,10,16)
+mean(random)
+median(random)
+min(random)
+max(random)
+range(random) # min and max at the same time
+ceiling(4.5)
+round(4.5)
+```
+
+## More advanced
+
+```{r}
+cumsum(c(1,2,4)) # Add 1 to 1, 2 to 1, 4 to 2
+cumprod(c(1,3,7)) # same with *
+cummax(c(7:9, 4:8, 1:10)) # Cummulate and sticks to the max it finds as it loops
+cummin(c(7:9, 4:8, 1:3))
+```
+
+## Random
+
+```{r}
+# Coin flip
+sample(0:1, 10, replace=T) # Replace means weigh the probability of the next flip based on the previou
+```
+
+# Regression analysis
+
+Study correlation between two pieces of data.
+```{r}
+mlbPlayers = read.table(file="./resources/mlb2017players.txt", 
+                        header=T, 
+                        sep=" ",
+                        na.strings="`",
+                        stringsAsFactors=F)
+playerData = mlbPlayers[,c("RBI", "AVG")]
+relation =lm(playerData$RBI~playerData$AVG)
+plot(playerData$AVG, playerData$RBI, main="AVG & RBI regression", abline(lm(playerData$RBI~playerData$AVG)), xlab="AVG", ylab="RBIs")
+```
+
