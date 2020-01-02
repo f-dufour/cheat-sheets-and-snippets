@@ -1,0 +1,91 @@
+---
+title: Principal Component Analysis (PCA)
+author: Florent Dufour
+output: html_notebook
+---
+
+# What is PCA?
+
+- PCA is a technique referred to as *dimensionality reduction*.
+- If you have a large data sets: several dimensions for the observations in the data set
+  - It can be overwhelming
+  - Which dimensions capture the essence of the data set?
+- PCA does transformation of numbers by using correlation
+- Principal components as a subset of the data set
+- Works well if the data set is highly correlated
+- Usefull to find trends in a data set
+
+# Calculate PCA
+
+- **Sample dataset**: `iris` (but the data set is not huge but easy example)
+- **Funtion**: `princomp`
+
+## Prepare the data
+
+princom can only work with numerical data:
+
+```{r}
+head(iris) # the last column is not numerical
+```
+
+We have to remove the "Species" column:
+
+```{r}
+d <- iris[,-5] # exclude the last
+d
+```
+
+## Apply PCA
+
+```{r}
+pc <- princomp(d, cor=TRUE, score=TRUE)
+summary(pc)
+```
+
+Input data = 4 features, then 4 components.
+
+- **Cummulative proportion:** 
+  - Component 1 is a reflection of 73% of the variation of the data
+  - Component 2 is a reflection of 23% of the variation of the data, then, cummulated comp1. and comp2. represent 96%
+  - ...
+  
+We could just consider comp1. and comp2. to have a grasp of the data
+
+How many components to consider? As much as to reach 95% OR with a standard dev. of 1. Depends on the domain of application.
+
+# Visual representation of the PCA
+
+1. Draw an elbow curve:
+
+```{r}
+plot(pc, type="l")
+```
+
+> Comp.1 is really the most important one.
+
+2. Biplot
+
+```{r}
+biplot(pc)
+```
+
+- 3 components in the same direction
+- Sepal.Width in another direction. It participates in the variation.
+
+# Look at the loadings and scores
+
+## Loadings
+
+```{r}
+attributes(pc) # Many attributes, including the loadings
+pc$loadings
+```
+
+- Second component does not even consider length and width
+
+## Scores
+
+```{r}
+pc$scores
+```
+

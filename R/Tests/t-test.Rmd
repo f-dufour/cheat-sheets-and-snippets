@@ -1,0 +1,88 @@
+---
+title: "t-test"
+author: "Florent Dufour"
+output: html_document
+---
+
+> Perform t-test with R on the gapminder dataset.
+
+# Preparation of the data set
+
+```{r}
+install.packages("gapminder")
+data(gapminder) # Make it visible as an object in the Environment tab
+```
+
+# About the data set
+
+## Summary
+
+```{r}
+summary(gapminder) # quick summary
+mean(gapminder$gdpPercap) # Quick result
+
+attach(gapminder) # Don't need to use the data frame notation anymore (lazy trick)
+mean(pop) # It works now
+```
+
+## Plots
+
+```{r}
+hist(lifeExp)
+hist(pop) # Right squewed ... Then log transformation:
+hist(log(pop))
+boxplot(lifeExp~continent) # Distribution of pop, focused on continents
+plot(lifeExp~log(gdpPercap))
+```
+
+# Difference of life expetency between south Africa and Ireland
+
+Provide new dataset manipulation functions and the pipe (`%>%`) operator.
+
+```{r}
+install.packages("dplyr")
+```
+
+```{r}
+library(dplyr)
+gapminder %>%
+  select(country, lifeExp) %>%
+  filter(country == "South Africa" | country == "Ireland") %>%
+  group_by(country) %>%
+  summarise(Average_life = mean(lifeExp))
+```
+
+c.a. 20 years of difference between the two life expetencies.
+
+> **Question**: Is this difference significant ?
+
+```{r}
+df1 <- gapminder %>%
+  select(country, lifeExp) %>%
+  filter(country == "South Africa" | country == "Ireland")
+
+
+t.test(data=df1, lifeExp~country)
+```
+
+Our p-value is: 4.466e-09
+We reject the null hypothesis, the difference is significant.
+
+# Data visualization
+
+```{r}
+install.packages("ggplot2")
+```
+
+```{r}
+library(ggplot2)
+gapminder %>%
+  filter(gdpPercap < 50000) %>%
+  ggplot(aes(x=log(gdpPercap), y=lifeExp, col=year, size=pop))+
+  geom_point(alpha=0.3)+
+  geom_smooth(method=lm)+
+  facet_wrap(~continent)
+```
+
+
+
