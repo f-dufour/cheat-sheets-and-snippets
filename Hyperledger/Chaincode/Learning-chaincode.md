@@ -49,7 +49,8 @@ deleteState(key: string): Promise<void>; // Records the specified key to be dele
 ```
 
 :warning: put and delete take effect when the then transaction is validated **and** sucessfully commited.
-:warning: Get only retrn the value when data modified by putState is commited. If the key does not exist in the db, empty buffer is returned.
+
+:warning: Get only return the value when data modified by putState is commited. If the key does not exist in the db, empty buffer is returned.
 
 # In practice
 
@@ -100,7 +101,7 @@ In js:
 - **Fabric-contract-api** node.js module : A high-level contract API for implementing smart contracts
 - **Fabric-shim** node.js module: A low-level contract API for implementing smart contracts
 
-# Chaincide workflow
+# Chaincode workflow
 
 For help:
 ```sh
@@ -125,3 +126,28 @@ For help:
 ```
 
 4. transactions can be created
+
+# Writing a smart contract
+
+## Anatomy
+
+> Let a smart contract "pancake-contract" be the subject of this section. It is a TypeScript file.
+
+### Decorators
+
+#### asset
+
+- `@Property()`
+
+#### asset-contract
+
+- `@Transaction()` Functions that define the trasaction on the ledger. This is how we interact.
+	- `@Transaction(true)` or `@Transaction()` *submitted transaction*: Change the content of the ledger
+	- `@Transaction(false)` *evaluated transaction*: Does not change the content. It's a query.
+- `@Info`
+- `@Returns`
+
+# Packaging a smart contract
+
+- A smart contract is packaged as a `.CDS file`
+- A CDS can be installed on a Fabric peer
