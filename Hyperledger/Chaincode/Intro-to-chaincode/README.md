@@ -3,17 +3,17 @@ title: Learning chaincode
 author: Florent Dufour
 ---
 
-# Whay is it?
+# What is it?
 
 - Smart contracts written in Go, JS, or Java
 - Executed inside a channel
 - No limitations in terms of logic or libraries
-- As many cc as we need inside a channel
+- As many chaincodes (cc) as we need inside a channel
 - Only cc are able to update the ledger
 - cc implement an interface: define the methods available (see below)
 - Deploying a cc is done in 2 phases:
 	1. Install the cc on the peer: Has to be on the peer because the peer contains the ledger. Once installed nothing happens really.
-	2. Instantiate the cc on the peer: This is when the magin happens: connect to the ledger and create the connections. This is where we have to define the **Endorsement policy** wit the logic operators. (e.g. Before you update, I want every peer to verify before commiting // I want the majority // I want at least one peer)
+	2. Instantiate the cc on the peer: This is when the magin happens: connect to the ledger and create the connections. This is where we have to define the **Endorsement policy** wit the logic operators. (e.g. Before you update, I want every peer to verify before committing // I want the majority // I want at least one peer)
 - Policy is per chain code. Each chaincode has a policy
 
 > The chaincode manages the ledger state through transactions invoked by applications
@@ -42,7 +42,7 @@ transaction and instantiated on the channel.
 
 Important interface: `ChaincodeStub`: provides functions to interact with the ledger. In js:
 
-```js
+```typescript
 getState(key: string): Promise<Buffer>; // Returns the value of the specified key from the ledger
 putState(key: string, value: Buffer): Promise<void>; //Puts the specified key and value into the transaction's Write set as a datawrite proposal
 deleteState(key: string): Promise<void>; // Records the specified key to be deleted in the Write set of the transaction proposal
@@ -54,11 +54,13 @@ deleteState(key: string): Promise<void>; // Records the specified key to be dele
 
 # In practice
 
+- Add the propoer dependencies (go, Java, or node.js)
 - 1 chaincode = 2 methods to create:
 	1. `Init`: Called when the cc is instantiated (and when the peer is restarted and chaincode is upgraded !!)
 	1. `Invoke`: Method that will update the ledger
 - Chaincode contains a main method that starts the chaincode: shim.Start(new(Chaincode))
 
+>  :bangbang: See [NakedChaincode](./NakedChaincode/chaincode.go) in this repo.
 
 ## Init
 
@@ -94,16 +96,87 @@ func (t *Chaincode) Invoke (stub shim.ChaincodeStubeInterface) pb.Response {
 - Possible to index **values** and make complex and efficient queries
 - LevelDB = Key - Value store
 
-# Fabric contract API
+# Fabric contrat
 
-In js:
+Common logic inside a contract:
+
+1. Get the parameters
+1. Validate the param
+1. Fix the types
+1. Evaluate the method
+1. Read the current sate of the data
+1. Simple updates
+1. Serialize the modification
+1. (possible to make composite key stub.CreateCompositeKey(index, []string{aaa, bbb, ccc}) to accelerate queries)
+1. Write to the chain
+ 
+No heavy computing in the contract: Image processing...
+
+## Interfaces and methods
+
+In `interfaces.go` we find the important methods and their documentation
+
+```go
+type Chaincode interface {
+    Init(stub ChaincodesStubInterface) pb.Response
+    Init(stub ChaincodeStubInterface) pb.Resonse
+}
+
+type ChaincodesStubInterface interface {
+    GetArgs() ...
+    GetStringArgs() ...
+    ...
+    GetState(key string) ...
+    PutState(key string, value []byte) ...
+    DelState(key string)
+    ...
+}
+```
+
+Also possible to work directly with couchDB
+> Exemple with GetQueryResult
+
+## Fabric contract API (In js)
+
+Everything as above
 
 - **Fabric-contract-api** node.js module : A high-level contract API for implementing smart contracts
 - **Fabric-shim** node.js module: A low-level contract API for implementing smart contracts
 
-# Chaincode workflow
+### TypeScript Decorators
+
+#### asset
+
+- `@Property()`
+
+#### asset-contract
+
+- `@Transaction()` Functions that define the transaction on the ledger. This is how we interact.
+	- `@Transaction(true)` or `@Transaction()` *submitted transaction*: Change the content of the ledger
+	- `@Transaction(false)` *evaluated transaction*: Does not change the content. It's a query.
+- `@Info`
+- `@Returns`
+
+# Events 
+
+```go
+stub.SetEvent(name string, payload []byte)
+```
+
+- Send an event with a name and a payload. Payload can be anything as it is an array of bytes (JSON, file, string...)
+- The event is sent to the SDK once the block has been committed to the blockchain. Data is now immutable.
+- SDK can listen for such events, unmarshall the payload, and do whatever we want (send email, kick another process...) !
+
+- Event won't be sent if we hit a shim.Error(). Good practice: Put the SetEvent as late as possible.
+
+
+# Packaging a smart contract
+
+- A smart contract is packaged as a `.CDS` file
+- A CDS can be installed on a Fabric peer
 
 For help:
+
 ```sh
 ~$ peer chaincode -h
 ```
@@ -119,6 +192,7 @@ For help:
 ```sh
 ~$ peer chaincode instantiate
 ```
+
 3. invoke chaincode's function:
 
 ```sh
@@ -126,28 +200,3 @@ For help:
 ```
 
 4. transactions can be created
-
-# Writing a smart contract
-
-## Anatomy
-
-> Let a smart contract "pancake-contract" be the subject of this section. It is a TypeScript file.
-
-### Decorators
-
-#### asset
-
-- `@Property()`
-
-#### asset-contract
-
-- `@Transaction()` Functions that define the trasaction on the ledger. This is how we interact.
-	- `@Transaction(true)` or `@Transaction()` *submitted transaction*: Change the content of the ledger
-	- `@Transaction(false)` *evaluated transaction*: Does not change the content. It's a query.
-- `@Info`
-- `@Returns`
-
-# Packaging a smart contract
-
-- A smart contract is packaged as a `.CDS file`
-- A CDS can be installed on a Fabric peer
