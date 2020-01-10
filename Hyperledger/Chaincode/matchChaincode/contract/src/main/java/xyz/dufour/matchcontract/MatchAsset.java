@@ -12,12 +12,14 @@ import xyz.dufour.matchcontract.model.Team;
 
 import java.util.List;
 
-/** A match asset immutably written on the blockchain */
+/** A match asset immutably written on the blockchain. */
 @DataType()
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class MatchAsset {
+    @Property()
+    public static final String DOCTYPE = "match";
     @Property()
     private String id;
     @Property()
@@ -45,6 +47,20 @@ public class MatchAsset {
         this.team1 = team1;
         this.team2 = team2;
         this.date = date;
+    }
+
+    /**
+     * The minimal constructor for creating a match asset data
+     *
+     * @see MatchData
+     * @param matchId
+     * @param team1
+     * @param team2
+     * @param date
+     */
+    public MatchAsset(String matchId, Team team1, Team team2, String date, List<Bet> bets) {
+        super();
+        this.bets = bets;
     }
 
     /** Serialize a match to a JSON with the corresponding fields */

@@ -1,5 +1,6 @@
 package xyz.dufour.matchcontract;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hyperledger.fabric.contract.ClientIdentity;
@@ -14,10 +15,12 @@ import org.hyperledger.fabric.shim.ledger.KeyModification;
 import org.hyperledger.fabric.shim.ledger.KeyValue;
 import org.hyperledger.fabric.shim.ledger.QueryResultsIterator;
 import xyz.dufour.matchcontract.model.Bet;
+import xyz.dufour.matchcontract.model.Choice;
 import xyz.dufour.matchcontract.model.Event;
 import xyz.dufour.matchcontract.model.Team;
 import xyz.dufour.matchcontract.utils.Transform;
 
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +35,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @NoArgsConstructor
 public class MatchContract implements ContractInterface {
     /** Prefix for match asset id recorded in the blockchain. Helps for indexing. */
-    private final String MATCH_KEY = "match";
+    private final String MATCH_KEY = MatchAsset.DOCTYPE;
 
     // --------------------------------------------------------
     // Methods from the interface
@@ -63,12 +66,20 @@ public class MatchContract implements ContractInterface {
      * @param matchId The id of the match
      * @return
      */
+    @Transaction() 
     public boolean matchExists(Context ctx, String matchId) {
         log.info("matchExists called");
 
+        boolean exists = false;
         String id = resolveId(matchId);
-        byte[] buffer = ctx.getStub().getState(id);
-        return (buffer != null && buffer.length > 0);
+
+        try { 
+            byte[] buffer = ctx.getStub().getState(id);
+            exists = buffer != null && buffer.length > 0;
+        } catch (NullPointerException npe) {
+            log.info("Match! " + matchId + " does not exist");
+        }
+        return exists;
     }
 
     /**
@@ -85,7 +96,7 @@ public class MatchContract implements ContractInterface {
      * @param date date of the match
      */
     @Transaction()
-    public void createMatch(Context ctx, String matchId, Team team1, Team team2, String date) {
+    public void createMatch(Context ctx, String matchId, Team team1, Team team2, String date) throws JsonProcessingException {
         log.info("createMatch called");
 
         boolean exists = matchExists(ctx, matchId);
@@ -111,7 +122,8 @@ public class MatchContract implements ContractInterface {
      * @param matchId
      * @return
      */
-    public MatchAsset readMatch(Context ctx, String matchId) {
+    @Transaction() // false
+    public MatchAsset readMatch(Context ctx, String matchId) throws JsonProcessingException {
         log.info("readMatch called");
 
         boolean exists = matchExists(ctx, matchId);
@@ -120,7 +132,7 @@ public class MatchContract implements ContractInterface {
         }
 
         String id = resolveId(matchId);
-        MatchAsset matchAsset = MatchAsset.fromJSONString(new String(ctx.getStub().getState(id), UTF_8)); // TODO: fromJSONString
+        MatchAsset matchAsset = MatchAsset.fromJSONString(new String(ctx.getStub().getState(id), UTF_8));
         return matchAsset;
     }
 
@@ -133,17 +145,17 @@ public class MatchContract implements ContractInterface {
      * @param matchId
      * @param team1
      * @param team2
-     * @param number
+     * @param date
      */
     @Transaction()
-    public void updateMatch(Context ctx, String matchId, Team team1, Team team2, String number) {
+    public void updateMatch(Context ctx, String matchId, Team team1, Team team2, String date) throws JsonProcessingException {
         log.info("updateMatch called");
 
         boolean exists = matchExists(ctx,matchId);
         if (!exists) {
             throw new RuntimeException("The match " + matchId + " does not exist");
         }
-        MatchAsset asset = new MatchAsset(matchId, team1, team2, number);
+        MatchAsset asset = new MatchAsset(matchId, team1, team2, date);
 
         String id = resolveId(matchId);
         byte[] value =  asset.toJSONString().getBytes(UTF_8);
@@ -185,6 +197,7 @@ public class MatchContract implements ContractInterface {
      * @param ctx
      * @return
      */
+    @Transaction() // false
     public List<MatchAsset> getAllMatch(Context ctx) {
         log.info("getAllMatch called");
 
@@ -197,7 +210,13 @@ public class MatchContract implements ContractInterface {
 
         List<KeyValue> allMatchKeyValue = Transform.iterableToList(matchIterator);
         allMatchKeyValue.forEach(kv -> allMatchAsStrings.add(kv.getStringValue()));
-        allMatchAsStrings.forEach(s -> allMatchAssets.add(MatchAsset.fromJSONString(s)));
+        allMatchAsStrings.forEach(s -> {
+            try {
+                allMatchAssets.add(MatchAsset.fromJSONString(s));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        });
 
         return allMatchAssets;
     }
@@ -211,6 +230,7 @@ public class MatchContract implements ContractInterface {
      * @param matchId
      * @return
      */
+    @Transaction() // false
     public List<MatchAsset> getMatchHistory(Context ctx, String matchId) {
         log.info("getMatchHistory called");
 
@@ -227,7 +247,13 @@ public class MatchContract implements ContractInterface {
 
         List<KeyModification> keyModification = Transform.iterableToList(historyForKey);
         keyModification.forEach(km -> historyAsStrings.add(km.getStringValue()));
-        historyAsStrings.forEach(s -> history.add(MatchAsset.fromJSONString(s)));
+        historyAsStrings.forEach(s -> {
+            try {
+                history.add(MatchAsset.fromJSONString(s));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        });
 
         return history;
     }
@@ -237,7 +263,7 @@ public class MatchContract implements ContractInterface {
     // --------------------------------------------------------
 
     /**
-     * Once the match is playes, we can immutably set the winner.
+     * Once the match is played, we can immutably set the winner.
      * <p>
      * This creates a transaction on the blockchain
      *
@@ -246,7 +272,7 @@ public class MatchContract implements ContractInterface {
      * @param winner
      */
     @Transaction()
-    public void setMatchWinner(Context ctx, String matchId, Team winner) {
+    public void setMatchWinner(Context ctx, String matchId, Team winner) throws JsonProcessingException {
         log.info("setMatchWinner called");
 
         boolean matchExists = matchExists(ctx, matchId);
@@ -255,7 +281,7 @@ public class MatchContract implements ContractInterface {
         }
 
         MatchAsset match = readMatch(ctx, matchId);
-        if(!List.of(Team.values()).contains(winner)){
+        if(!Arrays.asList(Team.values()).contains(winner)){
             throw new RuntimeException("Provide a valid winner, " + winner + " is not available among: " + Team.values());
         }
 
@@ -266,7 +292,6 @@ public class MatchContract implements ContractInterface {
     }
 
     /**
-     *
      * User are able to bet on a match
      * <p>
      * A match should exist in the world state and not have been played already.
@@ -279,7 +304,7 @@ public class MatchContract implements ContractInterface {
      * @param choice
      */
     @Transaction()
-    public void addBetMatch(Context ctx, String matchId, String user, Float amount, Team choice) {
+    public void addBetMatch(Context ctx, String matchId, String user, Float amount, Choice choice) throws JsonProcessingException {
         log.info("addBetMatch called");
 
         MatchAsset match = readMatch(ctx, matchId);
@@ -291,16 +316,16 @@ public class MatchContract implements ContractInterface {
             throw new RuntimeException("Provide valid amount for bet");
         }
 
-        if(!List.of(Team.values()).contains(choice)){
+        if(!Arrays.asList(Team.values()).contains(choice)){
             throw new RuntimeException("Provide a valid winner. " + choice + " is not available among: " + Team.values());
         }
 
-        Bet bet = new Bet(user, choice, amount, String.valueOf(ctx.getStub().getTxTimestamp().getEpochSecond()));
+        Bet bet = new Bet(user, matchId, choice, amount, String.valueOf(ctx.getStub().getTxTimestamp().getEpochSecond()));
         // But normally, use the client identity
         // bet.setUser(ctx.getClientIdentity().getAttributeValue("hf.EnrollementID"));
 
         if (match.getBets() == null || match.getBets().size() == 0) {
-            match.setBets(List.of(bet));
+            match.setBets(Arrays.asList(bet));
         } else {
             match.getBets().add(bet);
         }
@@ -327,7 +352,13 @@ public class MatchContract implements ContractInterface {
         List<MatchAsset> allMatchAssets = new ArrayList<>();
 
         stateList.forEach(kv -> allMatchAsStrings.add(kv.getStringValue()));
-        allMatchAsStrings.forEach(s -> allMatchAssets.add(MatchAsset.fromJSONString(s)));
+        allMatchAsStrings.forEach(s -> {
+            try {
+                allMatchAssets.add(MatchAsset.fromJSONString(s));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        });
 
         return allMatchAssets;
     }

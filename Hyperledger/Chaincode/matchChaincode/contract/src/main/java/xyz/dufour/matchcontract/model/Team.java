@@ -2,7 +2,8 @@ package xyz.dufour.matchcontract.model;
 
 /** Finite set of type safe constants to use for teams.
  * <p>
- * A minimal set of French soccer teams */
+ * A minimal set of French soccer teams
+ */
 public enum Team {
     PSG("Paris Saint-Germain"),
     OM("Olympique de Marseille"),
