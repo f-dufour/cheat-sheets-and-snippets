@@ -1,0 +1,10 @@
+/.classpath
+/.git/
+/.gradle/
+/.project
+/.settings/
+/.idea/
+/.sts4-cache
+
+/bin/
+/build/
