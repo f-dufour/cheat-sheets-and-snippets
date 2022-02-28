@@ -1,0 +1,50 @@
+.root {
+    
+}
+
+#bottomToolBar{
+	-fx-background-color: #0d64afaa;
+}
+
+.button{
+	-fx-background-color: #67be2a;
+	-fx-background-radius: 30.0px;
+	-fx-font-familiy: arial-rounded-bold;
+}
+
+#btnReload{
+	-fx-background-color: ff5600;
+}
+
+.button:hover{
+	-fx-background-color: #fcc344;
+}
+
+
+
+
+/*
+ * ScrollBar
+ */
+ 
+.scroll-bar:vertical>*.track-background {
+	-fx-background-color: #0c4d89;
+	-fx-opacity: 30%;
+}
+
+
+.scroll-bar:vertical>*.thumb {
+	-fx-background-color: #35435d;
+}
+
+.scroll-bar:vertical>*.increment-button {
+	-fx-opacity: 0%;
+}
+
+.scroll-bar:vertical>*.decrement-button {
+	-fx-opacity: 0%;
+}
+
+.scroll-bar:vertical>*.track {
+	-fx-opacity: 0%;
+}
