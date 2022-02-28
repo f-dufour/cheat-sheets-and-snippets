@@ -1,3 +1,5 @@
+> Robbins, Arnold. Bash Pocket Reference: Help for Power Users and Sys Admins. " O'Reilly Media, Inc.", 2016.
+
 # Exit codes
 
 - 0: Success 
