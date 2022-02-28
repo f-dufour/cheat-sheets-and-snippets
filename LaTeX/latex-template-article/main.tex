@@ -1,0 +1,71 @@
+\documentclass[a4paper]{article}
+
+% Variables
+\newcommand{\thisTitle}{This is the title of the document}
+\newcommand{\thisAuthor}{Florent \textsc{Dufour}}
+\newcommand{\thisDate}{\today}
+
+\newcommand{\thisSubject}{Document compiled on \today}
+\newcommand{\thisKeywords}{}
+\newcommand{\thisWebpage}{https://dufour.xyz}
+\newcommand{\thisAbstractName}{Abstract}
+\newcommand{\thisTOCName}{Table of contents}
+
+% Externalized config
+\usepackage{packages/preamble-flo}
+\usepackage{packages/encoding-flo}
+\usepackage{packages/biblio-flo}
+
+% For this document
+\usepackage[english]{babel}
+\usepackage{import}
+\usepackage{lipsum}
+
+%%
+%% TITLE PAGE
+%%
+
+\title{\thisTitle}
+\author{\thisAuthor}
+\date{\thisDate}
+
+%%
+%% DOCUMENT
+%%
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+\renewcommand{\abstractname}{\thisAbstractName}
+\begin{abstract}
+  \import{sections/}{Abstract.tex}
+\end{abstract}
+\clearpage
+
+%%
+%% TOC
+%%
+
+\renewcommand{\contentsname}{\thisTOCName}
+\tableofcontents
+\clearpage
+
+%%
+%% CONTENTS
+%%
+
+\section{Introduction}
+\import{sections/}{Introduction.tex}
+
+\section{Conclusion}
+\import{sections/}{Conclusion.tex}
+
+%%
+%% BIBLIO
+%%
+
+\printbibliography
+
+\end{document}

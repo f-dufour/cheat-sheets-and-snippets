@@ -18,4 +18,3 @@
 
 ### Pie chart
 
-### Box plot: Study the ditribution of a value
