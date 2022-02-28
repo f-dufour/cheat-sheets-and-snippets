@@ -1,0 +1,56 @@
+\documentclass[
+    sender,
+    paper=a4,
+    version=last,
+    fontsize=11pt,
+    DIV=13,
+    BCOR=0mm]{scrlttr2}
+\parskip3mm
+\parindent0mm % if you want to have no lineskip
+\usepackage[french]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{csquotes}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks = true,
+	linkbordercolor = {white},
+	linkcolor = {black},
+	anchorcolor = {black},
+	citecolor = {black},
+	filecolor = {black},
+	menucolor = {black},
+	runcolor =  {black},
+	urlcolor =  {blue}}
+\usepackage[T1]{fontenc}
+
+% Set Page layout:
+\usepackage{changepage}
+%\changepage{text height}{text width}{even-side margin}
+%{odd-side margin}{column sep.}
+%{topmargin}{headheight}{headsep}{footskip}
+\changepage{+3cm}{}{}{}{}{}{}{}{-5cm}
+\LoadLetterOption{sender}
+
+\begin{document}
+
+% subject, date, place:
+\setkomavar{subject}{This is the subject}
+\setkomavar{date}{\today}
+\setkomavar{place}{This is the place}
+
+% Set recipient of letter
+\begin{letter}{
+  Line 1 \\
+  Line 2 \\
+  Line 3 \\
+}
+
+\opening{Bonjour,}
+
+\input{body.tex}
+
+\closing{Très cordialement,}
+
+\end{letter}
+\end{document}
