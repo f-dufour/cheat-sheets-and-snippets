@@ -2,8 +2,8 @@
 
 HTML, CSS, JS, Jekyll.
 
-See:
+# See
 
-- [dufour.xyz](https://dufour.xyz), [code:](https://github.com/f-dufour/f-dufour.github.io)
+- [dufour.xyz](https://dufour.xyz)
 - [blog.dufour.xyz](https://blog.dufour.xyz)
 - [RyefieldSociety.com](https://ryefieldsociety.com)
