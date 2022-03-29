@@ -1,3 +1,5 @@
+# Apple Script
+
 See:
 
 - https://github.com/f-dufour/light-switcher

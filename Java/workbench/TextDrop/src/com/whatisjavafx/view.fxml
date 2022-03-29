@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.whatisjavafx.MainController">
+   <children>
+      <BorderPane prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <center>
+            <Pane BorderPane.alignment="CENTER">
+               <children>
+                  <Circle fx:id="dropZone" fill="#ffffff00" layoutX="138.0" layoutY="200.0" onDragDropped="#dropping" onDragEntered="#dragEntering" onDragExited="#dragExiting" onDragOver="#draggingOver" radius="100.0" stroke="#dadada" strokeType="INSIDE" strokeWidth="5.0" />
+                  <VBox alignment="BOTTOM_CENTER" layoutY="328.0" prefHeight="34.0" prefWidth="274.0">
+                     <children>
+                        <Label fx:id="labelPath" alignment="TOP_LEFT" contentDisplay="CENTER" text="File name" textAlignment="CENTER" />
+                        <Label fx:id="statusLabel" alignment="BOTTOM_RIGHT" text="Status" textAlignment="CENTER" />
+                     </children>
+                  </VBox>
+               </children>
+            </Pane>
+         </center>
+         <right>
+            <VBox BorderPane.alignment="CENTER_RIGHT">
+               <children>
+                  <Button fx:id="exportBtn" mnemonicParsing="false" onAction="#exportButtonListener" text="Export">
+                     <tooltip>
+                        <Tooltip fx:id="tooltipExport" hideOnEscape="false" onShowing="#tooltipExportFired" />
+                     </tooltip></Button>
+                  <Button fx:id="chooseFolderButton" mnemonicParsing="false" text="Choose Folder">
+                     <tooltip>
+                        <Tooltip text="Choose Tooltip" />
+                     </tooltip></Button>
+               </children>
+            </VBox>
+         </right>
+         <left>
+            <ListView />
+         </left>
+      </BorderPane>
+   </children>
+</AnchorPane>

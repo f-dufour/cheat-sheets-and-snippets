@@ -1,0 +1,32 @@
+## OUTPUT FILES
+*.dvi
+*.pdf
+*.ps
+*.html
+
+## TEMPORARY FILES
+*.acn
+*.acr
+*.alg
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.glg
+*.glo
+*.gls
+*.ist
+*.lof
+*.log
+*.lot
+*.out
+*.ps
+*.run.xml
+*.toc
+
+## SYSTEM FILES
+.DS_Store
+._*
+*.swp

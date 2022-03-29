@@ -1,0 +1,84 @@
+% Florent Dufour
+% A LaTeX article
+% 2017 - 2021
+
+\documentclass[a4paper]{article}
+
+%% -------- %%
+%% PREAMBLE %%
+%% -------- %%
+
+%% The preamble is provided in distinct files %%
+\usepackage{resources/sty/boilerplate-preamble}
+\usepackage{resources/sty/hyperref-preamble}
+\usepackage{resources/sty/biblio-preamble}
+\usepackage{resources/sty/color-preamble}
+\usepackage{resources/sty/acronyms}
+
+%% We will import content from separate .tex files %%
+\usepackage{import}
+
+%% Let's put things tidy in variables once and for all %%
+\def\thetitle{This is the title of the document}
+\def\theauthor{Florent Dufour}
+\def\thecoauthor{}
+\def\thedate{\today}
+
+\title{\thetitle}
+\author{\theauthor}
+\date{\thedate}
+
+%% Overload hypersetup %%
+\hypersetup{
+    pdftitle={\thetitle},
+	pdfauthor={\theauthor}
+}
+
+\begin{document}
+
+%% ---------- %%
+%% TITLE PAGE %%
+%% ---------- %%
+
+\thispagestyle{empty}
+\pagenumbering{gobble}
+\maketitle
+\begin{abstract}
+    \import{sections/}{abstract.tex}
+\end{abstract}
+
+%% ------ %%
+%% TABLES %%
+%% ------ %%
+
+%% Contents, figures, tables, abbreviations %%
+\clearpage\newpage
+\pagenumbering{roman}
+\renewcommand{\contentsname}{Table of Contents}
+\tableofcontents
+\listoffigures
+\listoftables
+\clearpage\newpage
+\printglossary[type=\acronymtype]
+\clearpage\newpage
+
+%% ---- %%
+%% BODY %%
+%% ---- %%
+
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+\section{Introduction}
+\import{sections/}{introduction.tex}
+
+\section{Perspectives}
+\import{sections/}{perspectives.tex}
+
+\section{Conclusion}
+\import{sections/}{conclusion.tex}
+
+\section{References}
+\printbibliography
+
+\end{document}

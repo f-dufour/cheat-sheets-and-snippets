@@ -1,7 +1,21 @@
+# System
 .DS_Store
-.idea
-.sts4-cache
+
 .vscode
 *zip
 *.swp
 .Rproj.user
+
+# Java
+target
+bin
+.settings
+*.class
+.idea
+.sts4-cache
+
+# LaTeX / Pandoc
+*.pdf
+*.ps
+*.dvi
+out.*

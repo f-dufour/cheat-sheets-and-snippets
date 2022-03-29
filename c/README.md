@@ -1,10 +1,5 @@
-> Kernighan, Brian W., and Dennis M. Ritchie. The C programming language. 1988.
+# C
 
-# Data types
+Based on:
 
-- int
-- float
-- char
-- short
-- long
-- double
+> Ritchie, Dennis M., Brian W. Kernighan, and Michael E. Lesk. The C programming language. Englewood Cliffs: Prentice Hall, 1988.
