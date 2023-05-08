@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  client-secret-prov:
+  client-query:
+  server-tf:
+
+networks:
+  tf:

@@ -1,7 +1,15 @@
 #!/bin/bash
-# Client Training GPU
+# Florent Dufour
+# Nov. 2022
 
-TF_SGX_SERVER_IP="20.229.102.204"
+apt-get update
+apt-get upgrade -y
+apt-get install -y fish tree git python3-dev python3-pip htop tmux git
+curl https://get.docker.com/ | bash
+
+#########################
+## Client Training GPU ##
+#########################
 
 ## ----------- ##
 ## PREPARATION ##
@@ -42,6 +50,38 @@ cd ../secret_prov
 AZURE=1 ./build_secret_prov_image.sh
 ./run_secret_prov.sh -i secret_prov_server:latest
 
-# /!\ Send Encrypted Model and SSL certificates here
-scp models.tar        root@$TF_SGX_SERVER_IP:/tmp
-scp ssl_configure.tar root@$TF_SGX_SERVER_IP:/tmp
+############
+## Server ##
+############
+
+cd ../tf-serving
+cp ../client/models.tar .
+cp ../client/ssl_configure.tar .
+tar -xvf models.tar
+tar -xvf ssl_configure.tar
+
+# Get resources
+mkdir -p git; cd $_
+git clone --depth=1 https://github.com/intel/confidential-computing-zoo.git
+cd confidential-computing-zoo/cczoo/tensorflow-serving-cluster/tensorflow-serving/
+
+# Setup SGX
+sudo ./setup_azure_vm.sh
+sudo systemctl status aesmd
+
+## ---------------------------------- ##
+## GET MODEL AND KEYS from client GPU ##
+## ---------------------------------- ##
+
+cd docker/tf_serving
+
+# scp files from client training GPU here
+cp /tmp/models.tar .
+cp /tmp/ssl_configure.tar .
+tar -xvf models.tar
+tar -xvf ssl_configure.tar
+
+# Tensorflow serving
+AZURE=1 ./build_gramine_tf_serving_image.sh
+cp ssl_configure/ssl.cfg .
+./run_gramine_tf_serving.sh -i gramine_tf_serving:latest -p 8500-8501 -m resnet50-v15-fp32 -s ssl.cfg -a attestation.service.com:$ATTESTATION_IP
